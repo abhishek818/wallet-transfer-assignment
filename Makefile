@@ -1,5 +1,6 @@
 APP_NAME=wallet-transfer-service
 DATABASE_URL=postgres://wallet_user:wallet_password@localhost:5432/wallet_transfer?sslmode=disable
+TEST_DATABASE_URL?=$(DATABASE_URL)
 HTTP_ADDR=:8080
 
 .PHONY: tidy
@@ -9,6 +10,10 @@ tidy:
 .PHONY: test
 test:
 	go test ./...
+
+.PHONY: test-integration
+test-integration:
+	TEST_DATABASE_URL="$(TEST_DATABASE_URL)" go test ./tests -run 'TestCreateTransfer_Postgres' -count=1
 
 .PHONY: docker-up
 docker-up:
