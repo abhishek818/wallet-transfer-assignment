@@ -96,26 +96,27 @@ func (r *PostgresRepository) GetIdempotencyRecordForUpdate(
 	return &record, nil
 }
 
-func (r *PostgresRepository) CreateIdempotencyRecord(
+func (r *PostgresRepository) TryCreateIdempotencyRecord(
 	ctx context.Context,
 	idempotencyKey string,
 	requestHash string,
-) error {
+) (bool, error) {
 	const query = `
 		INSERT INTO idempotency_records (
 			idempotency_key,
 			request_hash,
 			status
 		)
-		VALUES ($1, $2, 'STARTED');
+		VALUES ($1, $2, 'STARTED')
+		ON CONFLICT (idempotency_key) DO NOTHING;
 	`
 
-	_, err := r.tx.Exec(ctx, query, idempotencyKey, requestHash)
+	result, err := r.tx.Exec(ctx, query, idempotencyKey, requestHash)
 	if err != nil {
-		return fmt.Errorf("create idempotency record: %w", err)
+		return false, fmt.Errorf("try create idempotency record: %w", err)
 	}
 
-	return nil
+	return result.RowsAffected() == 1, nil
 }
 
 func (r *PostgresRepository) CompleteIdempotencyRecord(

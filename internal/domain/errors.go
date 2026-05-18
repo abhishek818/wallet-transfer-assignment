@@ -13,4 +13,5 @@ var (
 	ErrInvalidTransferState   = errors.New("invalid transfer state transition")
 	ErrInvalidLedgerEntryType = errors.New("invalid ledger entry type")
 	ErrIdempotencyConflict    = errors.New("idempotency key reused with different request payload")
+	ErrIdempotencyInProgress  = errors.New("idempotency request is still in progress")
 )

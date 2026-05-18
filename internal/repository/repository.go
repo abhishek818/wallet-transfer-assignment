@@ -33,11 +33,11 @@ type Repository interface {
 		idempotencyKey string,
 	) (*IdempotencyRecord, error)
 
-	CreateIdempotencyRecord(
+	TryCreateIdempotencyRecord(
 		ctx context.Context,
 		idempotencyKey string,
 		requestHash string,
-	) error
+	) (bool, error)
 
 	CompleteIdempotencyRecord(
 		ctx context.Context,
